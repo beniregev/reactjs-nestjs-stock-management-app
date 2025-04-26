@@ -8,7 +8,7 @@ export function App() {
   return (
     <>
       <h3 className="bg-indigo-600 text-white p-3 rounded-3xl">
-        React + Nest + MongoDB Stocks Management
+        Stocks Management
       </h3>
       <Router className="rounded-2xl">
         <Routes>
