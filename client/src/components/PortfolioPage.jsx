@@ -9,7 +9,6 @@ import {
   SearchOutlined,
 } from "@ant-design/icons";
 import portfolioStore from "../stores/portfolioStore";
-import SearchBar from "../components/SearchBar";
 
 export const PortfolioPage = observer(() => {
   const navigate = useNavigate();
@@ -23,7 +22,7 @@ export const PortfolioPage = observer(() => {
     } else {
       portfolioStore.fetchPortfolio();
     }
-  }, []);
+  }, [navigate]);
 
   const handleLogout = () => {
     portfolioStore.logout();

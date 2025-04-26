@@ -1,7 +1,7 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { userStore } from "../store/userStore";
+import { portfolioStore } from "../store/PortfolioStore";
 import { Button } from "antd";
 import axios from "axios";
 
@@ -11,12 +11,12 @@ export const StockDetailsPage = observer(() => {
   const navigate = useNavigate();
 
   useEffect(() => {
-    if (!userStore.user) {
+    if (!portfolioStore.user) {
       navigate("/");
       return;
     }
     fetchStockDetails();
-  }, []);
+  }, [navigate]);
 
   const fetchStockDetails = async () => {
     const res = await axios.get(
@@ -28,7 +28,7 @@ export const StockDetailsPage = observer(() => {
   };
 
   const handleLogout = () => {
-    userStore.logout();
+    portfolioStore.logout();
     navigate("/");
   };
 
