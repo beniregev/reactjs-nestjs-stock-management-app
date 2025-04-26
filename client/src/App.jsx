@@ -7,10 +7,10 @@ import "./App.css";
 export function App() {
   return (
     <>
-      <h1 className="bg-indigo-600 text-shadow-indigo-500 p-6 rounded-4xl">
+      <h3 className="bg-indigo-600 text-white p-3 rounded-3xl">
         React + Nest + MongoDB Stocks Management
-      </h1>
-      <Router>
+      </h3>
+      <Router className="rounded-2xl">
         <Routes>
           <Route path="/" element={<LoginPage />} />
           <Route path="/portfolio" element={<PortfolioPage />} />

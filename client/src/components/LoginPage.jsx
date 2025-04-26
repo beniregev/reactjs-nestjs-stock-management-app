@@ -13,7 +13,7 @@ export const LoginPage = observer(() => {
   };
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gray-100">
+    <div className="flex items-center justify-center min-h-screen bg-gray-100 rounded-2xl mt-2">
       <Form
         form={form}
         layout="vertical"
