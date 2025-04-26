@@ -1,6 +1,6 @@
 import React from "react";
 
-const PortfolioPage = () => {
+export const PortfolioPage = () => {
   return <div>PortfolioPage</div>;
 };
 
