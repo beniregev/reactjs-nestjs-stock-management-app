@@ -1,12 +1,37 @@
-# React + Vite
+# ReactJS + Vite Client Application
 
-This template provides a minimal setup to get React working in Vite with HMR and some ESLint rules.
+You need to have an `.env` file with the following parameters/properties:
 
-Currently, two official plugins are available:
+      VITE_SERVER_URL=http://localhost:5000
+      VITE_FMP_API_KEY=your_fmp_api_key_here
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Babel](https://babeljs.io/) for Fast Refresh
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/) for Fast Refresh
+Replace the text "your_fmp_api_key_here" with your API-Key for FMP (Financial Modeling Prep) API.
 
-## Expanding the ESLint configuration
+## Application Flow
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and [`typescript-eslint`](https://typescript-eslint.io) in your project.
+When you run the client application it will show you a login page. In that page you need to type your full name and an email in a valid format (there's no check for the email, just to have a unique username).
+
+Click "Login" button and you will get the list of stocks currently in your Portfolio. The list is retrieved from MongoDB Atlas by the username (the email that you typed in the login page).
+
+The stocks list includes the following columns:
+
+- Symbol (Stock Symbol).
+- Company Name.
+- Options:
+  - ⭐ icon (Favorite).
+  - 🗑️ icon (delete).
+  
+Click on any of the stocks to open the "Stock Details Page" with the following details:
+
+- Stock Name (dynamic `{stock name}`).
+- Stock details:
+  - Symbol
+  - Latest Quote
+  - Today's change percentage (%)
+
+### ⭐ UI/UX Notes
+
+- All icons have hover tooltips: ⭐ Favorite / 🗑️ Delete.
+- Favorite icon toggles ON/OFF visually.
+- Trash icon deletes immediately.
+- Logout clears local storage and navigates to Login.
