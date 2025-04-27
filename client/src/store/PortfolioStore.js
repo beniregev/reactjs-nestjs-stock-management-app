@@ -36,7 +36,7 @@ class PortfolioStore {
   }
 
   async fetchPortfolio() {
-    if (!this.username) return;
+    if (!this.username || this.username === "" || this.username.email === "") return;
     this.portfolio = await fetchPortfolio(this.username);
   }
 
