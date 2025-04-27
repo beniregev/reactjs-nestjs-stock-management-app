@@ -3,7 +3,7 @@ import { Document } from 'mongoose';
 
 export type StockDocument = Stock & Document;
 
-@Schema()
+@Schema({ collection: 'stockappcollection' })
 export class Stock {
   @Prop({ required: true })
   email: string;
@@ -12,7 +12,7 @@ export class Stock {
   symbol: string;
 
   @Prop({ required: true })
-  name: string;  // <-- kept it as "name" like you asked
+  name: string;
 
   @Prop({ default: false })
   isFavorite: boolean;

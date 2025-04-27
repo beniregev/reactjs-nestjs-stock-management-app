@@ -1,4 +1,4 @@
-import { Injectable } from '@nestjs/common';
+import { Logger, Injectable } from '@nestjs/common';
 import { InjectModel } from '@nestjs/mongoose';
 import { Stock, StockDocument } from './stock.schema';
 import { Model } from 'mongoose';
@@ -7,8 +7,9 @@ import { Model } from 'mongoose';
 export class StockService {
   constructor(@InjectModel(Stock.name) private stockModel: Model<StockDocument>) {}
 
-  async getStocksByEmail(email: string): Promise<Stock[]> {
-    return this.stockModel.find({ email }).exec();
+  async getStocksByEmail(emailAddress: string): Promise<Stock[]> {
+    const stocks = await this.stockModel.find({ email: emailAddress }).exec();
+    return stocks;
   }
 
   async addStock(email: string, symbol: string, name: string): Promise<Stock> {
