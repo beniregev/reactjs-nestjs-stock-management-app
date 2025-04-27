@@ -4,7 +4,7 @@ const API_BASE = import.meta.env.VITE_SERVER_URL;
 const FMP_API_KEY = import.meta.env.VITE_FMP_API_KEY;
 
 export const fetchPortfolio = async (userData) => {
-  const { data } = await axios.get(`${API_BASE}/portfolio?email=${userData.email}`);
+  const { data } = await axios.get(`${API_BASE}/portfolio?email=${encodeURIComponent(userData.email)}`);
   console.log("fetchPortfolio(" + userData.email + ")", data);
   return data;
 };

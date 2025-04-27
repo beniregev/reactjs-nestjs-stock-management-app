@@ -1,12 +1,12 @@
-import { Controller, Get, Post, Body, Query, Delete, Patch, UsePipes, ValidationPipe } from '@nestjs/common';
+import { Controller, Get, Post, Body, Query, Delete, Patch, Logger, UsePipes, ValidationPipe } from '@nestjs/common';
 import { StockService } from './stock.service';
 import { Stock } from './stock.schema';
 import { ApiTags, ApiOperation, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { CreateStockDto } from './dto/create-stock.dto';
 import { DeleteStockDto } from './dto/delete-stock.dto';
 
-@ApiTags('Stocks')
-@Controller('stocks')
+@ApiTags('Portfolio')
+@Controller('portfolio')
 export class StockController {
   constructor(private readonly stockService: StockService) {}
 
@@ -14,6 +14,7 @@ export class StockController {
   @ApiOperation({ summary: 'Get all stocks by user email' })
   @ApiQuery({ name: 'email', required: true })
   async getStocks(@Query('email') email: string): Promise<Stock[]> {
+    Logger.log('async getStocks by email: ' + email);
     return this.stockService.getStocksByEmail(email);
   }
 
