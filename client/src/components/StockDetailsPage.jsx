@@ -1,9 +1,9 @@
 import { useParams, useNavigate } from "react-router-dom";
 import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
-import { portfolioStore } from "../store/PortfolioStore";
 import { Button } from "antd";
 import axios from "axios";
+import portfolioStore from "../store/PortfolioStore";
 
 export const StockDetailsPage = observer(() => {
   const { symbol } = useParams();

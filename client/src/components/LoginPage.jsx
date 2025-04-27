@@ -1,14 +1,14 @@
 import { observer } from "mobx-react-lite";
-import { portfolioStore } from "../store/PortfolioStore";
 import { useNavigate } from "react-router-dom";
 import { Input, Button, Form } from "antd";
+import portfolioStore from "../store/PortfolioStore";
 
 export const LoginPage = observer(() => {
   const [form] = Form.useForm();
   const navigate = useNavigate();
 
   const handleOnFinish = (values) => {
-    portfolioStore.setUser(values);
+    portfolioStore.setUsername(values);
     navigate("/portfolio");
   };
 

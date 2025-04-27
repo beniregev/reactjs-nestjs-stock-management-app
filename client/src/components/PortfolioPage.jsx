@@ -1,118 +1,154 @@
-import { useEffect, useState } from "react";
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import { Button, Table, Tooltip, Input, Radio } from "antd";
+import { Input, Button, Radio, Tooltip } from "antd";
 import {
+  SearchOutlined,
+  LogoutOutlined,
   StarOutlined,
   StarFilled,
   DeleteOutlined,
-  SearchOutlined,
 } from "@ant-design/icons";
-import portfolioStore from "../stores/portfolioStore";
+import { useEffect, useState } from "react";
+import portfolioStore from "../store/PortfolioStore";
 
 export const PortfolioPage = observer(() => {
   const navigate = useNavigate();
-  const [searchType, setSearchType] = useState("local"); // 'local' or 'global'
-  const [searchField, setSearchField] = useState("symbol"); // 'symbol' or 'companyName'
-  const [searchQuery, setSearchQuery] = useState("");
+  const [searchText, setSearchText] = useState("");
+
+  const optionsLocation = [
+    { label: "Local", value: "local" },
+    { label: "Global", value: "global" },
+  ];
+  const optionsField = [
+    { label: "Stock", value: "symbol" },
+    { label: "Company", value: "company" },
+  ];
 
   useEffect(() => {
-    if (!portfolioStore.username) {
-      navigate("/");
-    } else {
-      portfolioStore.fetchPortfolio();
-    }
-  }, [navigate]);
+    portfolioStore.fetchPortfolio();
+  }, []);
 
   const handleLogout = () => {
     portfolioStore.logout();
     navigate("/");
   };
 
-  const handleSearch = async () => {
-    if (!searchQuery.trim()) return;
-    await portfolioStore.searchStocks(searchType, searchField, searchQuery);
+  const handleSearch = () => {
+    portfolioStore.setSearchQuery(searchText);
+    portfolioStore.searchStocks();
   };
 
-  const columns = [
-    {
-      title: "Symbol",
-      dataIndex: "symbol",
-      key: "symbol",
-      align: "left",
-    },
-    {
-      title: "Company Name",
-      dataIndex: "companyName",
-      key: "companyName",
-      align: "left",
-    },
-    {
-      title: "Options",
-      key: "options",
-      align: "right",
-      render: (text, record) => (
-        <div className="flex gap-2 justify-end">
-          <Tooltip title="Favorite">
-            {record.isFavorite ? (
-              <StarFilled
-                className="text-yellow-500 cursor-pointer"
-                onClick={() => portfolioStore.toggleFavorite(record.symbol)}
-              />
-            ) : (
-              <StarOutlined
-                className="cursor-pointer"
-                onClick={() => portfolioStore.toggleFavorite(record.symbol)}
-              />
-            )}
-          </Tooltip>
-          <Tooltip title="Delete">
-            <DeleteOutlined
-              className="text-red-500 cursor-pointer"
-              onClick={() => portfolioStore.deleteStock(record.symbol)}
-            />
-          </Tooltip>
-        </div>
-      ),
-    },
-  ];
-
-  const handleRowClick = (record) => {
-    portfolioStore.selectStock(record);
+  const handleStockClick = (stock) => {
+    portfolioStore.selectStock(stock);
     navigate("/details");
   };
 
   return (
-    <div className="min-h-screen flex flex-col p-4">
-      <div className="flex justify-end">
-        <Button type="primary" danger onClick={handleLogout}>
-          Logout
-        </Button>
-      </div>
+    <div className="min-h-screen bg-gray-100 flex flex-col items-center p-8">
+      <div className="w-full max-w-5xl">
+        {/* Top bar with Logout */}
+        <div className="flex justify-end mb-6">
+          <Button
+            type="primary"
+            danger
+            onClick={handleLogout}
+            icon={<LogoutOutlined />}
+          >
+            Logout
+          </Button>
+        </div>
 
-      <div className="mt-4">
-        <SearchBar
-          searchType={searchType}
-          setSearchType={setSearchType}
-          searchField={searchField}
-          setSearchField={setSearchField}
-          searchQuery={searchQuery}
-          setSearchQuery={setSearchQuery}
-          handleSearch={handleSearch}
-        />
-      </div>
-
-      <div className="flex justify-center mt-6">
-        <div className="w-full max-w-5xl">
-          <Table
-            dataSource={portfolioStore.portfolio.slice()}
-            columns={columns}
-            rowKey="symbol"
-            pagination={false}
-            onRow={(record) => ({
-              onClick: () => handleRowClick(record),
-            })}
+        {/* Search Bar Section */}
+        <div className="flex items-center justify-between mb-6 space-x-2 bg-white p-4 rounded-lg shadow">
+          {/* Radio Group 1: Local / Global */}
+          <Radio.Group
+            block
+            options={optionsLocation}
+            defaultValue="local"
+            optionType="button"
+            buttonStyle="solid"
+            onChange={(e) => portfolioStore.setSearchLocation(e.target.value)}
+            value={portfolioStore.searchLocation}
+            className="flex"
           />
+
+          {/* Radio Group 2: Symbol / Company Name */}
+          <Radio.Group
+            block
+            options={optionsField}
+            defaultValue="stock"
+            optionType="button"
+            buttonStyle="solid"
+            onChange={(e) => portfolioStore.setSearchField(e.target.value)}
+            value={portfolioStore.searchField}
+            className="flex ml-4 mr-4"
+          />
+
+          {/* Search Input */}
+          <Input
+            placeholder="Search..."
+            value={searchText}
+            onChange={(e) => setSearchText(e.target.value)}
+            className="w-1/3"
+          />
+
+          {/* Search Button */}
+          <Button
+            type="primary"
+            icon={<SearchOutlined />}
+            onClick={handleSearch}
+          />
+        </div>
+
+        {/* Stock List Table */}
+        <div className="bg-white rounded-lg shadow p-6">
+          <div className="flex justify-between font-bold mb-4">
+            <div className="w-1/2 text-left">Symbol</div>
+            <div className="w-1/2 text-left">Company Name</div>
+            <div className="text-right">Actions</div>
+          </div>
+          {portfolioStore.portfolio.length === 0 ? (
+            <div className="text-center text-gray-500">
+              No stocks to display.
+            </div>
+          ) : (
+            portfolioStore.portfolio.map((stock) => (
+              <div
+                key={stock._id}
+                className="flex justify-between items-center py-2 border-t hover:bg-gray-100 cursor-pointer"
+                onClick={() => handleStockClick(stock)}
+              >
+                <div className="w-1/2 text-left">{stock.symbol}</div>
+                <div className="w-1/2 text-left">{stock.name}</div>
+                <div className="flex space-x-2 justify-end items-center">
+                  <Tooltip title="Favorite">
+                    <Button
+                      icon={
+                        stock.is_favorite ? <StarFilled /> : <StarOutlined />
+                      }
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        portfolioStore.toggleFavorite(
+                          stock._id,
+                          stock.is_favorite
+                        );
+                      }}
+                    />
+                  </Tooltip>
+                  <Tooltip title="Delete">
+                    <Button
+                      danger
+                      icon={<DeleteOutlined />}
+                      onClick={(e) => {
+                        e.stopPropagation();
+                        portfolioStore.deleteStock(stock._id);
+                      }}
+                    />
+                  </Tooltip>
+                </div>
+              </div>
+            ))
+          )}
         </div>
       </div>
     </div>

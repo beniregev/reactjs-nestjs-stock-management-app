@@ -5,6 +5,9 @@ class PortfolioStore {
   username = '';
   portfolio = [];
   selectedStock = null;
+  searchLocation = "local";
+  searchField = "symbol";
+  searchQuery = null;
 
   constructor() {
     makeAutoObservable(this);
@@ -12,6 +15,18 @@ class PortfolioStore {
 
   setUsername(username) {
     this.username = username;
+  }
+
+  setSearchLocation(location) {
+    this.searchLocation = location;
+  }
+
+  setSearchQuery(query) {
+    this.searchQuery = query;
+  }
+
+  setSearchField(fieldName) {
+    this.searchField = fieldName;
   }
 
   logout() {
@@ -35,12 +50,13 @@ class PortfolioStore {
     await this.fetchPortfolio();
   }
 
-  async searchStocks(searchType, searchField, query) {
-    if (searchType === 'local') {
-      const result = await searchLocalStocks(this.username, searchField, query);
+  // async searchStocks(searchType, searchField, query) {
+  async searchStocks() {
+    if (this.searchLocation === 'local') {
+      const result = await searchLocalStocks(this.username, this.searchField, this.searchQuery);
       this.portfolio = result;
     } else {
-      const result = await searchGlobalStocks(searchField, query);
+      const result = await searchGlobalStocks(this.searchField, this.searchQuery);
       this.portfolio = result;
     }
   }
