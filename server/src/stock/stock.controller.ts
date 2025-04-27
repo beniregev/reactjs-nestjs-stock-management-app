@@ -22,8 +22,8 @@ export class StockController {
   @ApiOperation({ summary: 'Add a new stock to user portfolio' })
   @ApiBody({ type: CreateStockDto })
   async addStock(@Body() createStockDto: CreateStockDto): Promise<Stock> {
-    const { email, symbol, companyName } = createStockDto;
-    return this.stockService.addStock(email, symbol, companyName);
+    const { email, symbol, name } = createStockDto;
+    return this.stockService.addStock(email, symbol, name);
   }
 
   @Delete()
