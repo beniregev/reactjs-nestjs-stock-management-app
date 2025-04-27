@@ -1,4 +1,5 @@
 import { NestFactory } from '@nestjs/core';
+import { ConfigService } from '@nestjs/config';
 import { AppModule } from './app.module';
 import { StockService } from './stock/stock.service';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
@@ -6,6 +7,9 @@ import { ValidationPipe } from '@nestjs/common';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
+
+  const configService = app.get(ConfigService);
+  const serverPort = configService.get<number>('SERVER_PORT') || 3000;
 
   //  Global Validation 
   app.useGlobalPipes(new ValidationPipe({ whitelist: true }));
@@ -20,12 +24,11 @@ async function bootstrap() {
   const document = SwaggerModule.createDocument(app, config);
   SwaggerModule.setup('api', app, document);
 
-
-
   const stockService = app.get(StockService);
   // await stockService.populateInitialData();
   await stockService.populateInitialStocks(); // populate on startup
 
-  await app.listen(3000);
+  await app.listen(serverPort);
+  console.log(`Server is running on http://localhost:${serverPort}`);
 }
 bootstrap();
