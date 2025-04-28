@@ -43,7 +43,8 @@ export const PortfolioPage = observer(() => {
   const handleStockClick = (stock) => {
     if (!portfolioStore.isGlobalSearch) {
       portfolioStore.selectStock(stock);
-      navigate("/details");
+      // navigate("/details");
+      navigate("/details/" + stock.symbol);
     }
   };
 
@@ -107,6 +108,7 @@ export const PortfolioPage = observer(() => {
 
         {/* Stock List */}
         <div className="bg-white rounded-lg shadow p-6">
+          {/* Stock List - Headers */}
           <div className="flex justify-between font-bold mb-4">
             {portfolioStore.isGlobalSearch && <div className="w-1/12"></div>}
             <div className="w-1/4 text-left text-black">Symbol</div>
@@ -117,7 +119,7 @@ export const PortfolioPage = observer(() => {
               <div className="w-1/12 text-right text-black">Actions</div>
             )}
           </div>
-
+          {/* Stock List - Lines */}
           <div className="max-h-96 overflow-y-auto">
             {portfolioStore.portfolio.length === 0 ? (
               <div className="text-center text-black">
