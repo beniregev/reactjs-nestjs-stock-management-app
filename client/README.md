@@ -35,3 +35,39 @@ Click on any of the stocks to open the "Stock Details Page" with the following d
 - Favorite icon toggles ON/OFF visually.
 - Trash icon deletes immediately.
 - Logout clears local storage and navigates to Login.
+
+## Running The Project
+
+### Prerequisites
+
+- Make sure you are connected to the internet and have access to FMP API, including a valid API-Key.
+- Make sure you have environment variables defined with correct values, I used `.env` file in both the _client_ and _server_ folders.
+- Make sure you installed all the dependencies for the client and server applications, run `npm install`, or `npm i`, in both the _client_ and _server_ folders.
+
+### Run The ReactJS Client Application
+
+Run the following command in the client folder of the project: `npm run dev`. I created the ReactJS application using Vite, thus the default port is `5173`, if you have something running on it the the application will run on the next available port after it in sequence (i.e., `5174`, `5175`, etc.).
+
+### Run The NestJS Server Application
+
+**Important:** Make sure your MongoDB Atlas is running
+
+Navigate the the _server_ folder and run the following command: `npm run start:dev`.
+
+You should see in the terminal something similar to the following:
+
+    [Nest] 21216  - 04/27/2025, 6:26:37 PM     LOG [NestFactory] Starting Nest application...
+    [Nest] 21216  - 04/27/2025, 6:26:37 PM     LOG [InstanceLoader] AppModule dependencies initialized +16ms
+    [Nest] 21216  - 04/27/2025, 6:26:37 PM     LOG [InstanceLoader] MongooseModule dependencies initialized +1ms
+    [Nest] 21216  - 04/27/2025, 6:26:37 PM     LOG [InstanceLoader] ConfigHostModule dependencies initialized +0ms
+    [Nest] 21216  - 04/27/2025, 6:26:37 PM     LOG [InstanceLoader] ConfigModule dependencies initialized +1ms
+    [Nest] 21216  - 04/27/2025, 6:26:37 PM     LOG [InstanceLoader] ConfigModule dependencies initialized +0ms
+    [Nest] 21216  - 04/27/2025, 6:26:39 PM     LOG [InstanceLoader] MongooseCoreModule dependencies initialized +2005ms
+    [Nest] 21216  - 04/27/2025, 6:26:39 PM     LOG [InstanceLoader] MongooseModule dependencies initialized +15ms
+    [Nest] 21216  - 04/27/2025, 6:26:39 PM     LOG [InstanceLoader] StockModule dependencies initialized +0ms
+    [Nest] 21216  - 04/27/2025, 6:26:41 PM     LOG [NestApplication] Nest application successfully started +2008ms
+
+
+### Swagger Documentation (OpenAPI)
+
+Navigate to `http://localhost:3000/api`, when `3000` is the port number of your server application. If the port number of your server application is not `3000` the replace the `3000` with the port number of your server application.
