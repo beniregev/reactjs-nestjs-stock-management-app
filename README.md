@@ -7,16 +7,18 @@
 - **Server:** NestJS + Mongoose + MongoDB + Validation + OpenAPI documentation (Swagger).
 - **Client:** ReactJS (Vite) + MobX + Ant Design + TailwindCSS + PostCSS + Axios.
   - Not in requirements: LoginPage to enter user-name and email (username) that is used to distinct between portfolios of different users.
-  - When "Login" is clicked the user is navigated to the Portfolio Page.
-- (Requirement) Portfolio Page - Done.
-  - When the Portfolio page is open the user's portfolio is retrieved and displayed.
-  - SearchBar: Not a requirement but, good UX. 
-    - The user can select where to search? Local = The portfolio in MongoDBto; Global = Using FMP API.
-    - The user can select what how to search? By Stock symbol or company name.
-    - The user type the search text and click the button to search.
-    - The search result is shown in a list/table under the SearchBar.
-  - Showing the user portfolio: stock symbol, company name, flag for favorite.
-  - For search results from a global search a column is added to select the stocks to add to the user's portfolio.
+  - Not in requirements: Using localStorage to store the username (email).
+  - Not in requirements: When "Login" is clicked the user is navigated to the Portfolio Page.
+  - (Requirement) Portfolio Page - Done.
+    - When the Portfolio page is open the user's portfolio is retrieved and displayed.
+    - SearchBar: Not a requirement but, good UX. 
+      - The user can select where to search? Local = The portfolio in MongoDBto; Global = Using FMP API.
+      - The user can select what how to search? By Stock symbol or company name.
+      - The user type the search text and click the button to search.
+      - The search result is shown in a list/table under the SearchBar.
+    - Showing the user portfolio: stock symbol, company name, flag for favorite.
+    - When searching locally the search text can be empty and the entire user portfolio will be retrieve from MongoDB.
+    - For search results from a global search a column is added to select the stocks to add to the user's portfolio.
 
 ### Open Issues
 
@@ -25,8 +27,6 @@
   - UI: Search for stocks by stock symbol or company name using the FMP API - Done.
   - UI: Select the stocks to add to the portfolio - Done.
   - BE: flow to add multiple stocks to support the UI/UX - WIP. 85% Done, having an issue with the endpoint.
-- When searching locally the search text can be empty and the entire user portfolio will be retrieve from MongoDB - 90%+ completed.
-  - Need to include the condition in the function to retrieve the stocks locally - TO DO.
 - Mark/unmark stock as favorite - 90% Completed, clicking the button doesn't work, suspecting that calling the endpoint (PATCH) returns an error.
 - Some other issues I want to improve to improve the UX.
 
