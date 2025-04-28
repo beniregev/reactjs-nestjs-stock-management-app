@@ -40,3 +40,11 @@ export const searchGlobalStocks = async (field, query) => {
     isFavorite: false,
   }));
 };
+
+export const addStocksToPortfolio = async (username, symbols) => {
+  const response = await axios.post('/api/portfolio/add-multiple', {
+    email: username.email,
+    symbols: symbols,
+  });
+  return response.data;
+}

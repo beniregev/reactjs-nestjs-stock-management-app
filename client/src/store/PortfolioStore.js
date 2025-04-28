@@ -1,5 +1,12 @@
 import { makeAutoObservable } from "mobx";
-import { fetchPortfolio, toggleFavoriteStock, deleteStockFromPortfolio, searchLocalStocks, searchGlobalStocks } from "../api/portfolioApi";
+import {
+  fetchPortfolio,
+  toggleFavoriteStock,
+  deleteStockFromPortfolio,
+  searchLocalStocks,
+  searchGlobalStocks,
+  addStocksToPortfolio
+} from "../api/portfolioApi";
 
 class PortfolioStore {
   username = '';
@@ -59,6 +66,11 @@ class PortfolioStore {
       const result = await searchGlobalStocks(this.searchField, this.searchQuery);
       this.portfolio = result;
     }
+  }
+
+  async addStocksToPortfolio(selectedSymbols) {
+    if (selectedSymbols.length === 0) return;
+    await addStocksToPortfolio(this.username, selectedSymbols);
   }
 
   selectStock(stock) {

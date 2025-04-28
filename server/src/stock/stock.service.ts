@@ -34,6 +34,18 @@ export class StockService {
     return stock.save();
   }
 
+  async addMultipleStocks(emailAddress: string, stocks: { symbol: string, name: string }[]): Promise<{ added: boolean }> {
+    const insertData = stocks.map(stock => ({
+      email: emailAddress,
+      symbol: stock.symbol,
+      name: stock.name,
+      isFavorite: false,
+    }));
+
+    await this.stockModel.insertMany(insertData);
+    return { added: true };
+  }
+
   async populateInitialStocks(): Promise<void> {
     const count = await this.stockModel.estimatedDocumentCount();
     if (count === 0) {

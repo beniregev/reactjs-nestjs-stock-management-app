@@ -1,6 +1,6 @@
 import { observer } from "mobx-react-lite";
 import { useNavigate } from "react-router-dom";
-import { Input, Button, Radio, Tooltip } from "antd";
+import { Input, Button, Radio, Tooltip, Checkbox } from "antd";
 import {
   SearchOutlined,
   LogoutOutlined,
@@ -14,6 +14,7 @@ import portfolioStore from "../store/PortfolioStore";
 export const PortfolioPage = observer(() => {
   const navigate = useNavigate();
   const [searchText, setSearchText] = useState("");
+  const [selectedStocks, setSelectedStocks] = useState([]);
 
   const optionsLocation = [
     { label: "Local", value: "local" },
@@ -36,11 +37,29 @@ export const PortfolioPage = observer(() => {
   const handleSearch = () => {
     portfolioStore.setSearchQuery(searchText);
     portfolioStore.searchStocks();
+    setSelectedStocks([]); // clear selections on new search
   };
 
   const handleStockClick = (stock) => {
+    if (portfolioStore.searchLocation === "global") return; // disable click in global search
     portfolioStore.selectStock(stock);
     navigate("/details");
+  };
+
+  const handleCheckboxChange = (stockSymbol, checked) => {
+    if (checked) {
+      setSelectedStocks([...selectedStocks, stockSymbol]);
+    } else {
+      setSelectedStocks(selectedStocks.filter((s) => s !== stockSymbol));
+    }
+  };
+
+  const handleAddSelectedStocks = async () => {
+    await portfolioStore.addStocksToPortfolio(selectedStocks);
+    setSelectedStocks([]);
+    setSearchText("");
+    portfolioStore.setSearchLocation("local");
+    portfolioStore.fetchPortfolio();
   };
 
   return (
@@ -76,7 +95,7 @@ export const PortfolioPage = observer(() => {
           <Radio.Group
             block
             options={optionsField}
-            defaultValue="stock"
+            defaultValue="symbol"
             optionType="button"
             buttonStyle="solid"
             onChange={(e) => portfolioStore.setSearchField(e.target.value)}
@@ -104,50 +123,88 @@ export const PortfolioPage = observer(() => {
         {/* Stock List Table */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between font-bold mb-4">
+            {portfolioStore.searchLocation === "global" && (
+              <div className="w-1/12 text-center text-black">Select</div>
+            )}
             <div className="w-1/2 text-left text-black">Symbol</div>
             <div className="w-1/2 text-left text-black">Company Name</div>
-            <div className="text-right text-black">Actions</div>
+            {portfolioStore.searchLocation === "local" && (
+              <div className="text-right text-black">Actions</div>
+            )}
           </div>
-          {portfolioStore.portfolio.length === 0 ? (
-            <div className="text-center text-black">No stocks to display.</div>
-          ) : (
-            portfolioStore.portfolio.map((stock) => (
-              <div
-                key={stock._id}
-                className="flex justify-between items-center py-2 border-t text-black hover:bg-gray-300 cursor-pointer"
-                onClick={() => handleStockClick(stock)}
-              >
-                <div className="w-1/2 text-left">{stock.symbol}</div>
-                <div className="w-1/2 text-left">{stock.name}</div>
-                <div className="flex space-x-2 justify-end items-center">
-                  <Tooltip title="Favorite">
-                    <Button
-                      icon={
-                        stock.is_favorite ? <StarFilled /> : <StarOutlined />
-                      }
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        portfolioStore.toggleFavorite(
-                          stock._id,
-                          stock.is_favorite
-                        );
-                      }}
-                    />
-                  </Tooltip>
-                  <Tooltip title="Delete">
-                    <Button
-                      danger
-                      icon={<DeleteOutlined />}
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        portfolioStore.deleteStock(stock._id);
-                      }}
-                    />
-                  </Tooltip>
-                </div>
+
+          <div className="overflow-y-auto" style={{ maxHeight: "400px" }}>
+            {portfolioStore.portfolio.length === 0 ? (
+              <div className="text-center text-black">
+                No stocks to display.
               </div>
-            ))
-          )}
+            ) : (
+              portfolioStore.portfolio.map((stock) => (
+                <div
+                  key={stock.symbol}
+                  className="flex justify-between items-center py-2 border-t text-black hover:bg-gray-300"
+                  onClick={() => handleStockClick(stock)}
+                >
+                  {portfolioStore.searchLocation === "global" && (
+                    <div className="w-1/12 text-center">
+                      <Checkbox
+                        checked={selectedStocks.includes(stock.symbol)}
+                        onChange={(e) => {
+                          e.stopPropagation();
+                          handleCheckboxChange(stock.symbol, e.target.checked);
+                        }}
+                      />
+                    </div>
+                  )}
+                  <div className="w-1/2 text-left">{stock.symbol}</div>
+                  <div className="w-1/2 text-left">{stock.name}</div>
+                  {portfolioStore.searchLocation === "local" && (
+                    <div className="flex space-x-2 justify-end items-center">
+                      <Tooltip title="Favorite">
+                        <Button
+                          icon={
+                            stock.isFavorite ? <StarFilled /> : <StarOutlined />
+                          }
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            portfolioStore.toggleFavorite(
+                              stock._id,
+                              stock.isFavorite
+                            );
+                          }}
+                        />
+                      </Tooltip>
+                      <Tooltip title="Delete">
+                        <Button
+                          danger
+                          icon={<DeleteOutlined />}
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            portfolioStore.deleteStock(stock._id);
+                          }}
+                        />
+                      </Tooltip>
+                    </div>
+                  )}
+                </div>
+              ))
+            )}
+          </div>
+
+          {/* Add Button */}
+          {portfolioStore.searchLocation === "global" &&
+            portfolioStore.portfolio.length > 0 && (
+              <div className="flex justify-end mt-4">
+                <Button
+                  type="primary"
+                  style={{ backgroundColor: "blue", color: "white" }}
+                  onClick={handleAddSelectedStocks}
+                  className="text-2xl"
+                >
+                  Add Selected Stocks
+                </Button>
+              </div>
+            )}
         </div>
       </div>
     </div>

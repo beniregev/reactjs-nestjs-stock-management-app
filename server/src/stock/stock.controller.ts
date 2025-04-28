@@ -3,6 +3,7 @@ import { StockService } from './stock.service';
 import { Stock } from './stock.schema';
 import { ApiTags, ApiOperation, ApiQuery, ApiBody } from '@nestjs/swagger';
 import { CreateStockDto } from './dto/create-stock.dto';
+import { AddMultipleStocksDto } from './dto/add-multiple-stocks.dto';
 import { DeleteStockDto } from './dto/delete-stock.dto';
 
 @ApiTags('Portfolio')
@@ -25,6 +26,16 @@ export class StockController {
   async addStock(@Body() createStockDto: CreateStockDto): Promise<Stock> {
     const { email, symbol, name } = createStockDto;
     return this.stockService.addStock(email, symbol, name);
+  }
+
+  @Post('/add-multiple')
+  @UsePipes(new ValidationPipe({ whitelist: true }))
+  @ApiOperation({ summary: 'Add multiple stocks to user portfolio' })
+  @ApiBody({ type: AddMultipleStocksDto })
+  async addMultipleStocks(@Body() addMultipleStocksDto: AddMultipleStocksDto): Promise<{ added: boolean }> {
+    const { email, stocks } = addMultipleStocksDto;
+    const multipleStocks = this.stockService.addMultipleStocks(email, stocks);
+    return multipleStocks;
   }
 
   @Delete()
