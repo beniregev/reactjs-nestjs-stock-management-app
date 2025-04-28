@@ -2,14 +2,6 @@
   <a href="http://nestjs.com/" target="blank"><img src="https://nestjs.com/img/logo-small.svg" width="120" alt="Nest Logo" /></a>
 </p>
 
-You need to have an `.env` file with the following properties/parameters:
-
-    MONGO_URI=mongodb+srv://<username>:<password>@<your-cluster>.mongodb.net/portfolio_db
-  FMP_API_KEY=your-fmp-api-key-here
-    SERVER_PORT=3000
-    CLIENT_PORT=5713
-
-
 [circleci-image]: https://img.shields.io/circleci/build/github/nestjs/nest/master?token=abc123def456
 [circleci-url]: https://circleci.com/gh/nestjs/nest
 
