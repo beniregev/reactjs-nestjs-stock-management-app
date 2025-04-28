@@ -14,12 +14,15 @@ export class StockService {
 
   async addStock(email: string, symbol: string, name: string): Promise<Stock> {
     const newStock = new this.stockModel({ email, symbol, name });
-    return newStock.save();
+    const stock = newStock.save();
+    return stock;
   }
 
-  async deleteStock(email: string, symbol: string): Promise<{ deleted: boolean }> {
-    const result = await this.stockModel.deleteOne({ email, symbol });
-    return { deleted: result.deletedCount > 0 };
+  async deleteStock(emailAddress: string, stockSymbol: string): Promise<{ deleted: boolean }> {
+    Logger.log('email=' + emailAddress + ', symbol="' + stockSymbol + '"');
+    const result = await this.stockModel.deleteOne({ email: emailAddress, symbol: stockSymbol });
+    const isDeleted = { deleted: result.deletedCount > 0 };
+    return isDeleted;
   }
 
   async toggleFavorite(email: string, symbol: string): Promise<Stock | null> {
@@ -35,11 +38,12 @@ export class StockService {
     const count = await this.stockModel.estimatedDocumentCount();
     if (count === 0) {
       await this.stockModel.insertMany([
-        { email: 'beni@email.com', symbol: 'AAPL', name: 'Apple Inc.', isFavorite: false },
-        { email: 'beni@email.com', symbol: 'GOOGL', name: 'Alphabet Inc.', isFavorite: false },
-        { email: 'beni@email.com', symbol: 'NICE', name: 'Nice Ltd.', isFavorite: true },
-        { email: 'benir@email.com', symbol: 'NICE', name: 'Nice Ltd.', isFavorite: false },
-        { email: 'benir@email.com', symbol: 'NICE.TA', name: 'Nice Ltd.', isFavorite: true },
+        { email: 'beni@example.com', symbol: 'AAPL', name: 'Apple Inc.', isFavorite: false },
+        { email: 'beni@example.com', symbol: 'GOOGL', name: 'Alphabet Inc.', isFavorite: false },
+        { email: 'beni@example.com', symbol: 'NICE', name: 'Nice Ltd.', isFavorite: true },
+        { email: 'beni@example.com', symbol: 'NICE.TA', name: 'Nice Ltd.', isFavorite: true },
+        { email: 'benir@example.com', symbol: 'NICE', name: 'Nice Ltd.', isFavorite: false },
+        { email: 'benir@example.com', symbol: 'NICE.TA', name: 'Nice Ltd.', isFavorite: true },
       ]);
       console.log('Initial stocks inserted');
     }

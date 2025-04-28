@@ -69,7 +69,7 @@ export const PortfolioPage = observer(() => {
             buttonStyle="solid"
             onChange={(e) => portfolioStore.setSearchLocation(e.target.value)}
             value={portfolioStore.searchLocation}
-            className="flex"
+            className="flex pl-2 pr-2"
           />
 
           {/* Radio Group 2: Symbol / Company Name */}
@@ -81,7 +81,7 @@ export const PortfolioPage = observer(() => {
             buttonStyle="solid"
             onChange={(e) => portfolioStore.setSearchField(e.target.value)}
             value={portfolioStore.searchField}
-            className="flex ml-4 mr-4"
+            className="flex ml-4 mr-4 pl-2 pr-2"
           />
 
           {/* Search Input */}
@@ -97,25 +97,24 @@ export const PortfolioPage = observer(() => {
             type="primary"
             icon={<SearchOutlined />}
             onClick={handleSearch}
+            className="p-px"
           />
         </div>
 
         {/* Stock List Table */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between font-bold mb-4">
-            <div className="w-1/2 text-left">Symbol</div>
-            <div className="w-1/2 text-left">Company Name</div>
-            <div className="text-right">Actions</div>
+            <div className="w-1/2 text-left text-black">Symbol</div>
+            <div className="w-1/2 text-left text-black">Company Name</div>
+            <div className="text-right text-black">Actions</div>
           </div>
           {portfolioStore.portfolio.length === 0 ? (
-            <div className="text-center text-gray-500">
-              No stocks to display.
-            </div>
+            <div className="text-center text-black">No stocks to display.</div>
           ) : (
             portfolioStore.portfolio.map((stock) => (
               <div
                 key={stock._id}
-                className="flex justify-between items-center py-2 border-t hover:bg-gray-100 cursor-pointer"
+                className="flex justify-between items-center py-2 border-t text-black hover:bg-gray-300 cursor-pointer"
                 onClick={() => handleStockClick(stock)}
               >
                 <div className="w-1/2 text-left">{stock.symbol}</div>
