@@ -1,20 +1,25 @@
 import { makeAutoObservable } from "mobx";
-import {
-  fetchPortfolio,
-  toggleFavoriteStock,
-  deleteStockFromPortfolio,
-  searchLocalStocks,
-  searchGlobalStocks,
-  addStocksToPortfolio
+import { 
+  fetchPortfolio, 
+  toggleFavoriteStock, 
+  deleteStockFromPortfolio, 
+  searchLocalStocks, 
+  searchGlobalStocks, 
+  addMultipleStocksToPortfolio 
 } from "../api/portfolioApi";
 
+const keyUserEmail = "stockMgr-email";
+const stringEmpty = "";
+
 class PortfolioStore {
-  username = '';
+  username = stringEmpty;
   portfolio = [];
   selectedStock = null;
   searchLocation = "local";
   searchField = "symbol";
-  searchQuery = null;
+  searchQuery = stringEmpty;
+  isGlobalSearch = false; // NEW: to track if we are displaying global search results
+  selectedStocks = new Set(); // NEW: set to track selected checkboxes
 
   constructor() {
     makeAutoObservable(this);
@@ -22,10 +27,22 @@ class PortfolioStore {
 
   setUsername(username) {
     this.username = username;
+    localStorage.setItem(keyUserEmail, username.email);
+  }
+
+  getUserName() {
+    if (!this.username) {
+      const userEmail = localStorage.getItem(keyUserEmail);
+      this.username = userEmail !== stringEmpty ? { email: userEmail } : stringEmpty;
+    }
+    return this.username;
   }
 
   setSearchLocation(location) {
     this.searchLocation = location;
+    if (location === 'local') {
+      this.isGlobalSearch = false;
+    }
   }
 
   setSearchQuery(query) {
@@ -36,15 +53,31 @@ class PortfolioStore {
     this.searchField = fieldName;
   }
 
+  toggleStockSelection(symbol) {
+    if (this.selectedStocks.has(symbol)) {
+      this.selectedStocks.delete(symbol);
+    } else {
+      this.selectedStocks.add(symbol);
+    }
+  }
+
+  clearSelection() {
+    this.selectedStocks.clear();
+  }
+
   logout() {
     this.username = '';
     this.portfolio = [];
     this.selectedStock = null;
+    this.isGlobalSearch = false;
+    this.clearSelection();
+    localStorage.setItem(keyUserEmail, stringEmpty);
   }
 
   async fetchPortfolio() {
-    if (!this.username || this.username === "" || this.username.email === "") return;
+    if (!this.getUserName() || this.getUserName() === stringEmpty) return;
     this.portfolio = await fetchPortfolio(this.username);
+    this.isGlobalSearch = false;
   }
 
   async toggleFavorite(symbol) {
@@ -57,20 +90,41 @@ class PortfolioStore {
     await this.fetchPortfolio();
   }
 
-  // async searchStocks(searchType, searchField, query) {
   async searchStocks() {
     if (this.searchLocation === 'local') {
+      if (!this.searchQuery) {
+        await this.fetchPortfolio();
+        return;
+      }
       const result = await searchLocalStocks(this.username, this.searchField, this.searchQuery);
       this.portfolio = result;
+      this.isGlobalSearch = false;
     } else {
+      if (!this.searchQuery) return; // Don't search with empty query in global
       const result = await searchGlobalStocks(this.searchField, this.searchQuery);
+      console.log("Global Search Result", result);
       this.portfolio = result;
+      this.isGlobalSearch = true;
     }
+    this.clearSelection();
   }
 
-  async addStocksToPortfolio(selectedSymbols) {
-    if (selectedSymbols.length === 0) return;
-    await addStocksToPortfolio(this.username, selectedSymbols);
+  async addSelectedStocks() {
+    if (this.selectedStocks.size === 0) return;
+
+    const stocksToAdd = this.portfolio
+      .filter(stock => this.selectedStocks.has(stock.symbol))
+      .map(stock => ({
+        symbol: stock.symbol,
+        name: stock.name,
+      }));
+
+    await addMultipleStocksToPortfolio(this.username, stocksToAdd);
+
+    this.setSearchLocation('local');
+    this.setSearchQuery('');
+    await this.fetchPortfolio();
+    this.clearSelection();
   }
 
   selectStock(stock) {

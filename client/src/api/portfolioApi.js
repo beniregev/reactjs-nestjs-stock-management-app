@@ -34,12 +34,29 @@ export const searchGlobalStocks = async (field, query) => {
     : `https://financialmodelingprep.com/api/v3/search-name?query=${formattedQuery}&limit=10&apikey=${FMP_API_KEY}`;
 
   const { data } = await axios.get(endpoint);
+  console.log("searchGlobalStocks -- Data: ", data);
   return data.map(stock => ({
     symbol: stock.symbol,
     companyName: stock.name,
-    isFavorite: false,
+    currency: stock.currency,
+    exchange: stock.exchangeShortName,
   }));
 };
+
+export async function addMultipleStocksToPortfolio(username, stocks) {
+  const response = await fetch(`/api/portfolio/add-multiple`, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({
+      email: username.email,
+      stocks,
+    }),
+  });
+  if (!response.ok) {
+    throw new Error('Failed to add multiple stocks');
+  }
+  return response.json();
+}
 
 export const addStocksToPortfolio = async (username, symbols) => {
   const response = await axios.post('/api/portfolio/add-multiple', {

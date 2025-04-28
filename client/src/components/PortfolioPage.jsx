@@ -37,29 +37,14 @@ export const PortfolioPage = observer(() => {
   const handleSearch = () => {
     portfolioStore.setSearchQuery(searchText);
     portfolioStore.searchStocks();
-    setSelectedStocks([]); // clear selections on new search
+    setSelectedStocks([]);
   };
 
   const handleStockClick = (stock) => {
-    if (portfolioStore.searchLocation === "global") return; // disable click in global search
-    portfolioStore.selectStock(stock);
-    navigate("/details");
-  };
-
-  const handleCheckboxChange = (stockSymbol, checked) => {
-    if (checked) {
-      setSelectedStocks([...selectedStocks, stockSymbol]);
-    } else {
-      setSelectedStocks(selectedStocks.filter((s) => s !== stockSymbol));
+    if (!portfolioStore.isGlobalSearch) {
+      portfolioStore.selectStock(stock);
+      navigate("/details");
     }
-  };
-
-  const handleAddSelectedStocks = async () => {
-    await portfolioStore.addStocksToPortfolio(selectedStocks);
-    setSelectedStocks([]);
-    setSearchText("");
-    portfolioStore.setSearchLocation("local");
-    portfolioStore.fetchPortfolio();
   };
 
   return (
@@ -120,20 +105,20 @@ export const PortfolioPage = observer(() => {
           />
         </div>
 
-        {/* Stock List Table */}
+        {/* Stock List */}
         <div className="bg-white rounded-lg shadow p-6">
           <div className="flex justify-between font-bold mb-4">
-            {portfolioStore.searchLocation === "global" && (
-              <div className="w-1/12 text-center text-black">Select</div>
-            )}
-            <div className="w-1/2 text-left text-black">Symbol</div>
-            <div className="w-1/2 text-left text-black">Company Name</div>
-            {portfolioStore.searchLocation === "local" && (
-              <div className="text-right text-black">Actions</div>
+            {portfolioStore.isGlobalSearch && <div className="w-1/12"></div>}
+            <div className="w-1/4 text-left text-black">Symbol</div>
+            <div className="w-1/4 text-left text-black">Name</div>
+            <div className="w-1/4 text-left text-black">Currency</div>
+            <div className="w-1/4 text-left text-black">Exchange</div>
+            {!portfolioStore.isGlobalSearch && (
+              <div className="w-1/12 text-right text-black">Actions</div>
             )}
           </div>
 
-          <div className="overflow-y-auto" style={{ maxHeight: "400px" }}>
+          <div className="max-h-96 overflow-y-auto">
             {portfolioStore.portfolio.length === 0 ? (
               <div className="text-center text-black">
                 No stocks to display.
@@ -142,35 +127,40 @@ export const PortfolioPage = observer(() => {
               portfolioStore.portfolio.map((stock) => (
                 <div
                   key={stock.symbol}
-                  className="flex justify-between items-center py-2 border-t text-black hover:bg-gray-300"
+                  className="flex justify-between items-center py-2 border-t text-black hover:bg-gray-300 cursor-pointer"
                   onClick={() => handleStockClick(stock)}
                 >
-                  {portfolioStore.searchLocation === "global" && (
+                  {portfolioStore.isGlobalSearch && (
                     <div className="w-1/12 text-center">
                       <Checkbox
-                        checked={selectedStocks.includes(stock.symbol)}
-                        onChange={(e) => {
-                          e.stopPropagation();
-                          handleCheckboxChange(stock.symbol, e.target.checked);
-                        }}
+                        checked={portfolioStore.selectedStocks.has(
+                          stock.symbol
+                        )}
+                        onChange={() =>
+                          portfolioStore.toggleStockSelection(stock.symbol)
+                        }
+                        onClick={(e) => e.stopPropagation()}
                       />
                     </div>
                   )}
-                  <div className="w-1/2 text-left">{stock.symbol}</div>
-                  <div className="w-1/2 text-left">{stock.name}</div>
-                  {portfolioStore.searchLocation === "local" && (
-                    <div className="flex space-x-2 justify-end items-center">
+                  <div className="w-1/4 text-left">{stock.symbol}</div>
+                  <div className="w-1/4 text-left">{stock.companyName}</div>
+                  <div className="w-1/4 text-left">{stock.currency}</div>
+                  <div className="w-1/4 text-left">{stock.exchange}</div>
+                  {!portfolioStore.isGlobalSearch && (
+                    <div className="w-1/12 flex space-x-2 justify-end items-center">
                       <Tooltip title="Favorite">
                         <Button
                           icon={
-                            stock.isFavorite ? <StarFilled /> : <StarOutlined />
+                            stock.is_favorite ? (
+                              <StarFilled />
+                            ) : (
+                              <StarOutlined />
+                            )
                           }
                           onClick={(e) => {
                             e.stopPropagation();
-                            portfolioStore.toggleFavorite(
-                              stock._id,
-                              stock.isFavorite
-                            );
+                            portfolioStore.toggleFavorite(stock._id);
                           }}
                         />
                       </Tooltip>
@@ -192,19 +182,17 @@ export const PortfolioPage = observer(() => {
           </div>
 
           {/* Add Button */}
-          {portfolioStore.searchLocation === "global" &&
-            portfolioStore.portfolio.length > 0 && (
-              <div className="flex justify-end mt-4">
-                <Button
-                  type="primary"
-                  style={{ backgroundColor: "blue", color: "white" }}
-                  onClick={handleAddSelectedStocks}
-                  className="text-2xl"
-                >
-                  Add Selected Stocks
-                </Button>
-              </div>
-            )}
+          {portfolioStore.isGlobalSearch && (
+            <div className="flex justify-center mt-4">
+              <Button
+                type="primary"
+                style={{ backgroundColor: "blue", color: "white" }}
+                onClick={() => portfolioStore.addSelectedStocks()}
+              >
+                Add Selected Stocks
+              </Button>
+            </div>
+          )}
         </div>
       </div>
     </div>
